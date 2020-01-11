@@ -12,10 +12,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 
+import matplotlib.image as mpimg
+
+img=mpimg.imread('croped_image.tif')
+print([img])
+
 np.random.seed(1337)
 
 # MNIST dataset
 (x_train, _), (x_test, _) = mnist.load_data()
+
+x_test[0] = img
+
 
 image_size = x_train.shape[1]
 x_train = np.reshape(x_train, [-1, image_size, image_size, 1])
@@ -28,7 +36,7 @@ x_test = x_test.astype('float32') / 255
 noise = np.random.normal(loc=0.5, scale=0.5, size=x_train.shape)
 x_train_noisy = x_train + noise
 noise = np.random.normal(loc=0.5, scale=0.5, size=x_test.shape)
-x_test_noisy = x_test + noise
+x_test_noisy = x_test #+ noise
 
 x_train_noisy = np.clip(x_train_noisy, 0., 1.)
 x_test_noisy = np.clip(x_test_noisy, 0., 1.)
@@ -102,14 +110,8 @@ autoencoder.summary()
 
 autoencoder.compile(loss='mse', optimizer='adam')
 
-# Train the autoencoder
-autoencoder.fit(x_train_noisy,
-                x_train,
-                validation_data=(x_test_noisy, x_test),
-                epochs=15,
-                batch_size=batch_size)
 # Save the autoencoder´s weights
-autoencoder.save('autoencoder_model.h5')
+autoencoder = keras.models.load_model('./autoencoder_model.h5')
 
 # Predict the Autoencoder output from corrupted test images
 x_decoded = autoencoder.predict(x_test_noisy)
