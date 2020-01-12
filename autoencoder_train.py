@@ -11,11 +11,35 @@ from keras.datasets import mnist
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+import matplotlib.image as mpimg
 
 np.random.seed(1337)
 
 # MNIST dataset
 (x_train, _), (x_test, _) = mnist.load_data()
+print('MNIST Shape: ', x_train.shape)
+
+# Microscope dataset
+train = []
+for i in range(1,120):
+  fileName = 'canal_1/s_C001T'
+  fileName += '%0*d' % (3, i)
+  fileName += '.tif'
+  train.append(mpimg.imread(fileName))
+x_train = np.asarray(train)
+print('TPP Shape: ', x_train.shape)
+
+test = []
+for i in range(120,151):
+  fileName = 'canal_1/s_C001T'
+  fileName += '%0*d' % (3, i)
+  fileName += '.tif'
+  test.append(mpimg.imread(fileName))
+x_test = np.asarray(test)
+
+
+# img=mpimg.imread('croped_image.tif')
+# print([img])
 
 image_size = x_train.shape[1]
 x_train = np.reshape(x_train, [-1, image_size, image_size, 1])
@@ -106,16 +130,16 @@ autoencoder.compile(loss='mse', optimizer='adam')
 autoencoder.fit(x_train_noisy,
                 x_train,
                 validation_data=(x_test_noisy, x_test),
-                epochs=15,
+                epochs=5,
                 batch_size=batch_size)
 # Save the autoencoder´s weights
-autoencoder.save('autoencoder_model.h5')
+autoencoder.save('models/autoencoder_model.h5')
 
 # Predict the Autoencoder output from corrupted test images
 x_decoded = autoencoder.predict(x_test_noisy)
 
 # Display the 1st 8 corrupted and denoised images
-rows, cols = 10, 30
+rows, cols = 4, 4
 num = rows * cols
 imgs = np.concatenate([x_test[:num], x_test_noisy[:num], x_decoded[:num]])
 imgs = imgs.reshape((rows * 3, cols, image_size, image_size))
