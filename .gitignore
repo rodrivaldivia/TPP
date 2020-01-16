@@ -1,3 +1,12 @@
+# Model
+models/autoencoder_model.h5
+
+#Test
+canal_1/
+
+#Train
+train/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
