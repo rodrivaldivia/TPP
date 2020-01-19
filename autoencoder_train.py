@@ -21,8 +21,9 @@ def get_image(fileName):
   image = Image.fromarray(im / np.amax(im) * 255)
   # im.mode = 'I'
   im = im.point(lambda i:i*(1./256)).convert('L')
-  size = 32, 32
-  image.thumbnail(size, Image.ANTIALIAS)
+  # size = 32, 32
+  # image.thumbnail(size, Image.ANTIALIAS)
+
   # enhancer = ImageEnhance.Brightness(im)
   # enhanced_im = enhancer.enhance(2.0)
   # im.save("enhanced.sample1.png")
@@ -34,7 +35,8 @@ def load_train_img(fileName):
   image = Image.open(fileName)
   # image = Image.fromarray(im / np.amax(im) * 255)
   arr = np.asarray(image)
-  split = arr.shape[1]/32 #256
+  # split = arr.shape[1]/32 #256
+  split = arr.shape[1]/256
   arr = np.split(arr, split)
   arr = np.array([np.split(x, split, 1) for x in arr])
   return arr
