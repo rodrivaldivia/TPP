@@ -46,6 +46,15 @@ def interpolation(value, beta):
 	vi = beta * vi + (1 - beta) *value
 	return vi
 
+def checkMouseInImage(event):
+	try:
+		position = event.pos
+		print("Probamos")
+		return position[0] >= 0 and position[0] < 256 and position[1] >= 0 and position[1] < 256
+	except:
+		print("Fallo")
+		return False
+
 im = Image.open("./Images/canal1/s_C001T001.tif")
 out = im.convert("RGB")
 out.save('pnged_first_image.png', "PNG", quality=100)
@@ -80,9 +89,10 @@ while(dead==False):
 			clicked = True
 		if event.type == pygame.MOUSEBUTTONUP:
 			clicked = False
-		if clicked:
+		if clicked and checkMouseInImage(event):
 			# print(event, event.pos)
-			pygame.draw.circle(background_image, (0,255,0,0.3), event.pos, 5)
+			print("Pintamos")
+			pygame.draw.circle(background_image, (0,255,0,0.1), event.pos, 7)
 		if event.type == pygame.QUIT:
 			dead = True
 
