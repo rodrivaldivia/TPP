@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 
-im = Image.open("./Images/canal1/s_C001T001.tif")
+im = Image.open("./train/s_C001T015.tif")
 
 a = np.array(im)
 

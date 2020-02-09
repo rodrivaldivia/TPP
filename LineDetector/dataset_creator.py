@@ -68,7 +68,7 @@ def draw_curve_line_top(drawable_image):
 		line.extend([x2,y2])
 		x1 , y1 = x2, y2
 		if(direction == 0):
-			angle = angle +  abs(random.randint(0,5))
+			angle = angle + abs(random.randint(0,5))
 		else:
 			angle = angle - abs(random.randint(0,5))
 	drawable_image.line(line, fill=(180,180,180,random.randint(100,255)), width = random.randint(1,4), joint='curve')
