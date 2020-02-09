@@ -1,8 +1,7 @@
 import math 
 import random
 import numpy as np
-from PIL import Image, ImageDraw 
-from PIL import ImagePath  
+from PIL import Image, ImageDraw, ImageFilter, ImagePath
 
 new_image = Image.new("L", (256,256),'#000').convert('RGBA')
 
@@ -46,11 +45,14 @@ for j in range(5):
 	else:
 		x2 = x1 + oposite_cathetus
 		y2 = y1 + adyacent_cathetus
-	drawable_image.line([x1, y1, x2, y2], fill='#fff', width = 1, joint='curve')
+	drawable_image.line([x1, y1, x2, y2], fill='#fff', width =4, joint='curve')
 
 out = Image.alpha_composite(new_image, base)
 
+blured = out.filter(ImageFilter.GaussianBlur(radius=2))
+
 out.show()
+blured.show()
 
 # from PIL import Image, ImageDraw, ImageFont
 # # get an image
