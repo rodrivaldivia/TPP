@@ -15,12 +15,12 @@ class SwirlingTentacle:
 		self.position = position
 		self.chunks = chunks
 		if(position == BOTTOM):
-			x1, y1 = random.randint(0,256), 256 
+			x1, y1 = random.randint(0,256) , 256 
 		else:
-			x1, y1 = 0, random.randint(0,256) 
+			x1, y1 = 0, random.randint(0,256)
 		self.initial_position = (x1, y1)
 		self.direction = random.randint(0,1)
-		self.initial_angle = random.randint(0,180)
+		self.initial_angle = random.randint(-90,90)
 		coordinates = [[self.initial_position, self.initial_angle]]
 		self.direction = random.randint(0,1)
 		self.movement_index = 0
@@ -33,6 +33,7 @@ class SwirlingTentacle:
 				new_angle = previous_angle -  abs(random.randint(0,5))
 			coordinates.append([(0,0), new_angle])
 		self.coordinates = coordinates
+		self.wobble_direction = abs(1 - self.direction)
 
 		
 
@@ -45,13 +46,13 @@ class SwirlingTentacle:
 			x1, y1 = self.coordinates[index][0]
 			angle_sin = np.sin(angle* np.pi / 180)
 			angle_cos = np.cos(angle* np.pi / 180)
-			adyacent_cathetus = angle_sin*CHUNK_LENGTH
-			oposite_cathetus = angle_cos*CHUNK_LENGTH
-			if(angle > 90):
-				x2 = x1 + oposite_cathetus
+			oposite_cathetus = angle_sin*CHUNK_LENGTH
+			adyacent_cathetus = angle_cos*CHUNK_LENGTH
+			if(angle > 0):
+				x2 = x1 - oposite_cathetus
 				y2 = y1 - adyacent_cathetus
 			else:
-				x2 = x1 - oposite_cathetus
+				x2 = x1 + oposite_cathetus
 				y2 = y1 - adyacent_cathetus
 			self.coordinates[index+1][0] = (x2,y2)
 		coordinates = [ coordinate[0] for coordinate in self.coordinates]
@@ -64,14 +65,14 @@ class SwirlingTentacle:
 			x1, y1 = self.coordinates[index][0]
 			angle_sin = np.sin(angle* np.pi / 180)
 			angle_cos = np.cos(angle* np.pi / 180)
-			adyacent_cathetus = angle_sin*CHUNK_LENGTH
-			oposite_cathetus = angle_cos*CHUNK_LENGTH
-			if(angle > 90):
-				x2 = x1 - oposite_cathetus
-				y2 = y1 - adyacent_cathetus
+			oposite_cathetus = angle_sin*CHUNK_LENGTH
+			adyacent_cathetus = angle_cos*CHUNK_LENGTH
+			if(angle > 0):
+				x2 = x1 + adyacent_cathetus
+				y2 = y1 - oposite_cathetus
 			else:
-				x2 = x1 + oposite_cathetus
-				y2 = y1 + adyacent_cathetus
+				x2 = x1 + adyacent_cathetus
+				y2 = y1 + oposite_cathetus
 			self.coordinates[index+1][0] = (x2,y2)
 		coordinates = [ coordinate[0] for coordinate in self.coordinates]
 		return [ coordinate for tup in coordinates for coordinate in tup]
@@ -82,7 +83,7 @@ class SwirlingTentacle:
 		else:
 			return self._draw_horizontal()
 
-	def move(self):
+	def swirl(self):
 		movement_angle = 5
 		for index in range(self.movement_index+1):
 			previous_angle = self.coordinates[index][1]
@@ -96,31 +97,45 @@ class SwirlingTentacle:
 				self.movement_index = 0
 			else:
 				self.movement_index += 1
-			
+
+	def wobble(self):
+		index = self.movement_index
+		if (self.wobble_direction == 0):
+			self.coordinates[index][1] -= 3
+		else:
+			self.coordinates[index][1] += 3
+
+		if(self.movement_index == self.chunks):
+			self.movement_index = 0
+			self.wobble_direction = abs(1 - self.direction)
+		else:
+			self.movement_index += 1
+
 
 
 
 swirlyLine = SwirlingTentacle('bottom', 40)
 points = swirlyLine.draw()
 for i in range(40):
-	swirlyLine.move()
+	swirlyLine.swirl()
 points2 = swirlyLine.draw()
 for i in range(40):
-	swirlyLine.move()
+	swirlyLine.swirl()
 points3 = swirlyLine.draw()
 for i in range(40):
-	swirlyLine.move()
+	swirlyLine.swirl()
 points4 = swirlyLine.draw()
 swirlyLine2 = SwirlingTentacle('left', 40)
 points5 = swirlyLine2.draw()
+print(points5)
 for i in range(40):
-	swirlyLine2.move()
+	swirlyLine2.wobble()
 points6 = swirlyLine2.draw()
 for i in range(40):
-	swirlyLine2.move()
+	swirlyLine2.wobble()
 points7 = swirlyLine2.draw()
 for i in range(40):
-	swirlyLine2.move()
+	swirlyLine2.wobble()
 points8 = swirlyLine2.draw()
 
 from PIL import Image, ImageDraw, ImageFilter, ImagePath
