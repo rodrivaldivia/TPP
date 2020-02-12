@@ -3,6 +3,7 @@ models/autoencoder_model.h5
 
 #Test
 canal_1/
+Images/
 
 #Train
 train/
