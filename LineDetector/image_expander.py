@@ -1,6 +1,8 @@
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import asarray as ar, exp, sqrt
+from scipy.optimize import curve_fit
 import pygame
 
 
@@ -31,12 +33,26 @@ def interpolation(value, beta):
 	vi = beta * vi + (1 - beta) *value
 	return vi
 
+def gaus(x,a,mu,sigma):
+    return a*exp(-(x-mu1)**2/(2*sigma1**2))
+
+def fitFunction(data):
+	points = [ i for i in range(len(data)) ]
+	n = len(data) 
+	mean = sum(data*points)/n
+	sigma = sqrt(sum(data*(points-mean)**2)/n)
+	popt,pcov = curve_fit(gaus, points, data, maxfev=15000)  ## <--- leave out the first estimation of the parameters
+	return popt
+
 def brightness_profiler(array):
 	points = [ i for i in range(len(array))]
-	values = [ interpolation(i, 0.5) for i in array]
+	values = [ interpolation(i, 0.2) for i in array ]
 	print(points)
+	xx = np.linspace( 0, 50, 100 )  ## <--- calculate against a continuous variable
+	popt = fitFunction(array)
 	plt.plot(points, values, label='brightness')
-	plt.xlabel('pixes')
+	plt.plot(xx,gaus(xx,*popt),'r',label='fit') 
+	plt.xlabel('pixeles')
 	plt.ylabel('brightness')
 
 	plt.title("Brightness Profiler")

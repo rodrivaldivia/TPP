@@ -2,3 +2,5 @@ tensorflow
 keras
 Image
 matplotlib
+
+scipy
