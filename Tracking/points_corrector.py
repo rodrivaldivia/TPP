@@ -12,20 +12,25 @@ def showImage(im, points):
 def correctPoints(im, points):
 	arr = np.array(im.point(lambda i:i*(1./256)).convert('L'))
 	# print(a[:3])
-	point = points[5]
-	brightness_profiler(arr[point[1], point[0]-20:point[0]+20])
-	print(point)
-	newPoint = getNewMean(arr, point)
-	print(newPoint)
-
-	# arr[point[1], point[0]-10:point[0]+10] = 255
-	# b = Image.fromarray(arr)
-	# b.show()
+	# point = points[2]
+	newPoints = []
+	for point in points:
+		# brightness_profiler(arr[point[1], point[0]-20:point[0]+20])
+		newPoint = getNewMean(arr, point)
+		# print(point)
+		# print(newPoint)
+		newPoints.append(newPoint)
+	return newPoints
 
 def getNewMean(imageArray, point):
-	array = imageArray[point[1], point[0]-20:point[0]+20]
-	fitFunction(array)
-	return 0
+	newPoint = point
+	minX = max(point[0]-10, 0)
+	maxX = min(point[0]+10, 255)
+	array = imageArray[point[1], minX:maxX]
+	x = fitFunction(array).item(1)
+	# x = fitFunction(array)
+	newPoint = (x + minX, point[1])
+	return newPoint
 
 
 # Interpolation inital value
@@ -40,12 +45,12 @@ def gaus(x,a,mu,sigma):
     return a*exp(-(x-mu)**2/(2*sigma**2))
 
 def fitFunction(data):
-	points = [ i for i in range(len(data)) ]
-	n = len(data) 
-	mean = sum(data*points)/n
-	sigma = sqrt(sum(data*(points-mean)**2)/n)
-	popt,pcov = curve_fit(gaus, points, data)
-	print(popt)
+	points = range(len(data))
+	# n = len(data)
+	# # print(n)
+	# mean = sum(data*points)/n
+	# return mean
+	popt,pcov = curve_fit(gaus, points, data, maxfev = 10000)
 	return popt
 
 def brightness_profiler(array):

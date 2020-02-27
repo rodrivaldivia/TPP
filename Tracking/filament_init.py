@@ -12,7 +12,7 @@ def checkMouseInImage(event):
 		# print("Fallo")
 		return False
 
-def create():
+def create(imgPath):
 
 	pygame.init()
 
@@ -35,7 +35,7 @@ def create():
 
 	clock = pygame.time.Clock()
 
-	im = Image.open('Images/canal_1/s_C001T001.tif')
+	im = Image.open('Images/canal_1/' + imgPath)
 	im = im.point(lambda i:i*(1./256)).convert('L')
 	im.save('Images/canal_1/s_C001T001.png')
 	background_image = pygame.image.load('Images/canal_1/s_C001T001.png').convert()
