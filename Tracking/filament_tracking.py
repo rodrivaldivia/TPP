@@ -3,23 +3,24 @@ from PIL import Image, ImageDraw
 from os import listdir
 from os.path import isfile, join
 
-imgFolder = 'Images/canal_1'
+imgFolder = 'Images/canal_1/'
 images = [f for f in listdir(imgFolder) if isfile(join(imgFolder, f)) and f.endswith(".tif")]
 images.sort()
 
 # print(images)
 
 # filamentPoints = [(23, 15), (41, 30), (56, 43), (72, 59), (90, 73), (110, 87), (126, 104), (148, 126), (167, 142), (185, 168)]
+
 filamentPoints = filament_init.create(images[0])
-# print(coordenates);
+# filamentPoints = [(100, 208), (104, 196), (109, 186), (113, 176), (116, 164), (123, 153), (126, 141), (130, 129), (135, 118), (140, 106)]
+# print(filamentPoints);
 
 
 # original = Image.open('Images/canal_1/s_C001T001.tif')
 for imagePath in images:
-	im = Image.open('Images/canal_1/' + imagePath)
+	im = Image.open(imgFolder + imagePath)
 
 	filamentPoints = points_corrector.correctPoints(im, filamentPoints)
-
 	newPoints = []
 	for t in filamentPoints:
 		lst = list(t)

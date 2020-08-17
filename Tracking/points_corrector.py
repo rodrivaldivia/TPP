@@ -14,23 +14,59 @@ def correctPoints(im, points):
 	# print(a[:3])
 	# point = points[2]
 	newPoints = []
-	for point in points:
+	for index, point in enumerate(points):
 		# brightness_profiler(arr[point[1], point[0]-20:point[0]+20])
-		newPoint = getNewMean(arr, point)
+		vector = tuple([1,1])
+		if(index > 0):
+			vector = tuple(map(lambda x, y: x - y, point, points[index - 1]))
+		else:
+			vector = tuple(map(lambda x, y: x - y, points[index + 1], point))
+
+		slope = 0
+		if(vector[1] != 0):
+			slope = -vector[0]/vector[1]
+		# print(vector, slope)
+		newPoint = getNewMean(arr, point, slope)
 		# print(point)
 		# print(newPoint)
 		newPoints.append(newPoint)
 	return newPoints
 
-def getNewMean(imageArray, point):
+def boundIndexes(number):
+	newNum = max(number, 0)
+	newNum = min(255, newNum)
+	return newNum
+
+def getNewMean(imageArray, point, slope):
 	newPoint = point
-	minX = max(point[0]-10, 0)
-	maxX = min(point[0]+10, 255)
-	array = imageArray[point[1], minX:maxX]
-	x = fitFunction(array).item(1)
-	# x = fitFunction(array)
-	newPoint = (x + minX, point[1])
+	minX = max(point[0]-25, 0)
+	maxX = min(point[0]+25, 255)
+	#  Esta linea se cambia por la version con pendiente
+	points = []
+	for i in range(-25, 25):
+		x = round(point[0] + i)
+		y = round(point[1] + i*slope)
+		x = boundIndexes(x);
+		y = boundIndexes(y);
+		points.append((x,y));
+		# print(i, x, y, imageArray[(x, y)]);
+
+	# oldArray = imageArray[point[1], minX:maxX]
+	# print(oldArray)
+	array = np.array([imageArray[(e[1],e[0])] for e in points])
+	# print(array)
+	# x = fitFunction(array).item(1)
+	x = fitManually(array)
+	# print(x)
+	newPoint = (x + minX, point[1]) # y = oldY + x*slope
 	return newPoint
+
+
+def fitManually(array):
+	arraySum = 0
+	for i, point in enumerate(array):
+		arraySum += i*point
+	return arraySum/sum(array)
 
 
 # Interpolation inital value
