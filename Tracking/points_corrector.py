@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw
 from scipy import asarray as ar, exp, sqrt
 from scipy.optimize import curve_fit
+from scipy.stats import norm
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -37,11 +38,10 @@ def boundIndexes(number):
 	newNum = min(255, newNum)
 	return newNum
 
-def getNewMean(imageArray, point, slope):
+def getArrayFromPoint(point, slope):
 	newPoint = point
 	minX = max(point[0]-25, 0)
 	maxX = min(point[0]+25, 255)
-	#  Esta linea se cambia por la version con pendiente
 	points = []
 	for i in range(-25, 25):
 		x = round(point[0] + i)
@@ -49,20 +49,33 @@ def getNewMean(imageArray, point, slope):
 		x = boundIndexes(x);
 		y = boundIndexes(y);
 		points.append((x,y));
-		# print(i, x, y, imageArray[(x, y)]);
+	return points;
+
+def getNewMean(imageArray, point, slope):
+	pointsArray = [];
+	for i in range(-2,2):
+		shiftedPoint = tuple([point[0],point[1]+i]);
+		# shiftedPoint[1] += i;
+		pointsArray.append(getArrayFromPoint(shiftedPoint, slope));
+		# points = getArrayFromPoint(shiftedPoint, slope);
 
 	# oldArray = imageArray[point[1], minX:maxX]
 	# print(oldArray)
-	array = np.array([imageArray[(e[1],e[0])] for e in points])
+	imageArray = [ np.array([imageArray[(e[1],e[0])] for e in points]) for points in pointsArray ]
 	# print(array)
 	# x = fitFunction(array).item(1)
-	x = fitManually(array)
+	xArray = [ fitManually(array, point) for array in imageArray]
+	x = sum(xArray)/len(xArray)
 	# print(x)
+	minX = max(point[0]-25, 0)
+
 	newPoint = (x + minX, point[1]) # y = oldY + x*slope
 	return newPoint
 
 
-def fitManually(array):
+def fitManually(array, point):
+	# parameters = norm.fit(array)
+	# return parameters[0]
 	arraySum = 0
 	for i, point in enumerate(array):
 		arraySum += i*point
