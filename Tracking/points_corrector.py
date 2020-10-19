@@ -5,6 +5,8 @@ from scipy.stats import norm
 import numpy as np
 import matplotlib.pyplot as plt
 
+HORIZONTAL_RANGE = 10
+
 def showImage(im, points):
 	drawable_image = ImageDraw.Draw(im)
 	drawable_image.line(points, fill='#00ffff', width = 5, joint='curve')
@@ -40,10 +42,10 @@ def boundIndexes(number):
 
 def getArrayFromPoint(point, slope):
 	newPoint = point
-	minX = max(point[0]-25, 0)
-	maxX = min(point[0]+25, 255)
+	minX = max(point[0] - HORIZONTAL_RANGE, 0)
+	maxX = min(point[0] + HORIZONTAL_RANGE, 255)
 	points = []
-	for i in range(-25, 25):
+	for i in range(- HORIZONTAL_RANGE, HORIZONTAL_RANGE):
 		x = round(point[0] + i)
 		y = round(point[1] + i*slope)
 		x = boundIndexes(x);
@@ -52,22 +54,28 @@ def getArrayFromPoint(point, slope):
 	return points;
 
 def getNewMean(imageArray, point, slope):
-	pointsArray = [];
+	pointsArrayList = [];
+	# for i in range(-2,2):
 	for i in range(-2,2):
 		shiftedPoint = tuple([point[0],point[1]+i]);
 		# shiftedPoint[1] += i;
-		pointsArray.append(getArrayFromPoint(shiftedPoint, slope));
+		pointsArrayList.append(getArrayFromPoint(shiftedPoint, slope));
 		# points = getArrayFromPoint(shiftedPoint, slope);
 
 	# oldArray = imageArray[point[1], minX:maxX]
 	# print(oldArray)
-	imageArray = [ np.array([imageArray[(e[1],e[0])] for e in points]) for points in pointsArray ]
-	# print(array)
-	# x = fitFunction(array).item(1)
-	xArray = [ fitManually(array, point) for array in imageArray]
-	x = sum(xArray)/len(xArray)
+	imageArrayList = [ np.array([imageArray[(e[1],e[0])] for e in points]) for points in pointsArrayList ]
+	# print(imageArrayList[0])
+
+	# xList = [ fitFunction(array).item(1) for array in imageArrayList]
+
+	xList = [ fitFunction(array).item(1) for array in imageArrayList]
+	# print(xList)
+	# xArray = [ fitManually(array, point) for array in imageArray]
+	# x = sum(xArray)/len(xArray)
 	# print(x)
-	minX = max(point[0]-25, 0)
+	x = sum(xList)/len(xList)
+	minX = max(point[0] - HORIZONTAL_RANGE, 0)
 
 	newPoint = (x + minX, point[1]) # y = oldY + x*slope
 	return newPoint
@@ -95,11 +103,14 @@ def gaus(x,a,mu,sigma):
 
 def fitFunction(data):
 	points = range(len(data))
+	# print(points)
+	# print(data)
 	# n = len(data)
 	# # print(n)
 	# mean = sum(data*points)/n
 	# return mean
 	popt,pcov = curve_fit(gaus, points, data, maxfev = 10000)
+	# print(popt)
 	return popt
 
 def brightness_profiler(array):
