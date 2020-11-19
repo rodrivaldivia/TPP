@@ -3,14 +3,22 @@ import random
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImagePath
 
-# new_image = Image.new("L", (256,256),'#000').convert('RGBA')
-imarray = np.random.rand(256,256,3) * 50
-new_image = Image.fromarray(imarray.astype('uint8')).convert('RGBA')
 
-base = Image.new('RGBA', (256,256), (255,255,255,0))
+def generate_noise_img():
+	# noise_img = Image.new("L", (256,256),'#000').convert('RGBA')
+	# imarray = np.random.rand(256,256,3) * 50
+	
+	# Best aprox w/out noise profile
+	mean = 10
+	var = 60
+	sigma = var ** 0.5
+	gaussian = np.random.normal(mean, sigma, (256,256,3))
+	# Make it darker
+	gaussian = gaussian + 20
 
-drawable_image = ImageDraw.Draw(base)
-
+	noise_img = Image.fromarray(gaussian.astype('uint8')).convert("RGBA")
+	# noise_img.show()
+	return noise_img
 
 def draw_straight_line_top(drawable_image):
 	line_length = 400
@@ -103,6 +111,11 @@ def draw_curve_line_left(drawable_image):
 	drawable_image.line(line, fill=(180,180,180,random.randint(100,255)), width = random.randint(1,4), joint='curve')
 
 
+# MAIN
+
+clean_filaments = Image.new('RGBA', (256,256), (255,255,255,0))
+
+drawable_image = ImageDraw.Draw(clean_filaments)
 
 
 draw_straight_line_top(drawable_image)
@@ -115,8 +128,11 @@ draw_straight_line_left(drawable_image)
 draw_curve_line_top(drawable_image)
 draw_curve_line_left(drawable_image)
 
-out = Image.alpha_composite(new_image, base)
-converted_out = out.convert("LA")
-blured = converted_out.filter(ImageFilter.GaussianBlur(radius=2))
+noise_img = generate_noise_img()
+
+blured_filaments = clean_filaments.filter(ImageFilter.GaussianBlur(radius=2))
+noisy_blured_filaments = Image.alpha_composite(noise_img, blured_filaments)
+converted_out = noisy_blured_filaments.convert("LA")
+
 # blured = blured.filter(ImageFilter.SHARPEN)
-blured.show()
+converted_out.show()
