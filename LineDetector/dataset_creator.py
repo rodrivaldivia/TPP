@@ -131,6 +131,7 @@ draw_curve_line_left(drawable_image)
 noise_img = generate_noise_img()
 
 blured_filaments = clean_filaments.filter(ImageFilter.GaussianBlur(radius=2))
+blured_filaments.show()
 noisy_blured_filaments = Image.alpha_composite(noise_img, blured_filaments)
 converted_out = noisy_blured_filaments.convert("LA")
 
