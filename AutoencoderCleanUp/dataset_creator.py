@@ -3,16 +3,17 @@ import random
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImagePath
 
+IMG_SIZE = 28 # 256
 
 def generate_noise_img():
-	# noise_img = Image.new("L", (256,256),'#000').convert('RGBA')
-	# imarray = np.random.rand(256,256,3) * 50
+	# noise_img = Image.new("L", (IMG_SIZE,IMG_SIZE),'#000').convert('RGBA')
+	# imarray = np.random.rand(IMG_SIZE,IMG_SIZE,3) * 50
 	
 	# Best aprox w/out noise profile
 	mean = 10
 	var = 60
 	sigma = var ** 0.5
-	gaussian = np.random.normal(mean, sigma, (256,256,3))
+	gaussian = np.random.normal(mean, sigma, (IMG_SIZE,IMG_SIZE,3))
 	# Make it darker
 	gaussian = gaussian + 20
 
@@ -22,7 +23,7 @@ def generate_noise_img():
 
 def draw_straight_line_top(drawable_image):
 	line_length = 400
-	x1 , y1 = random.randint(0,256), 0 
+	x1 , y1 = random.randint(0,IMG_SIZE), 0 
 	angle = random.randint(0,180)
 	angle_sin = np.sin(angle* np.pi / 180)
 	angle_cos = np.cos(angle* np.pi / 180)
@@ -39,7 +40,7 @@ def draw_straight_line_top(drawable_image):
 
 def draw_straight_line_left(drawable_image):
 	line_length = 400
-	x1 , y1 =  0, random.randint(0,256)
+	x1 , y1 =  0, random.randint(0,IMG_SIZE)
 	angle = random.randint(0,180)
 	angle_sin = np.sin(angle* np.pi / 180)
 	angle_cos = np.cos(angle* np.pi / 180)
@@ -56,7 +57,7 @@ def draw_straight_line_left(drawable_image):
 
 def draw_curve_line_top(drawable_image):
 	step_length = 10
-	x1 , y1 = random.randint(0,256), 0 
+	x1 , y1 = random.randint(0,IMG_SIZE), 0 
 	line = [ x1, y1 ]
 	initial_angle = random.randint(0,180)
 	direction = random.randint(0,1)
@@ -84,7 +85,7 @@ def draw_curve_line_top(drawable_image):
 
 def draw_curve_line_left(drawable_image):
 	step_length = 10
-	x1 , y1 =  0, random.randint(0,256)
+	x1 , y1 =  0, random.randint(0,IMG_SIZE)
 	line = [ x1, y1 ]
 	initial_angle = random.randint(0,180)
 	direction = random.randint(0,1)
@@ -113,27 +114,42 @@ def draw_curve_line_left(drawable_image):
 
 # MAIN
 
-clean_filaments = Image.new('RGBA', (256,256), (255,255,255,0))
+def get_img_pair():
+	clean_filaments = Image.new('RGBA', (IMG_SIZE,IMG_SIZE), (255,255,255,0))
 
-drawable_image = ImageDraw.Draw(clean_filaments)
+	drawable_image = ImageDraw.Draw(clean_filaments)
 
 
-draw_straight_line_top(drawable_image)
-draw_straight_line_left(drawable_image)
-draw_curve_line_top(drawable_image)
-draw_curve_line_left(drawable_image)
+	draw_straight_line_top(drawable_image)
+	draw_straight_line_left(drawable_image)
+	draw_curve_line_top(drawable_image)
+	draw_curve_line_left(drawable_image)
 
-draw_straight_line_top(drawable_image)
-draw_straight_line_left(drawable_image)
-draw_curve_line_top(drawable_image)
-draw_curve_line_left(drawable_image)
+	draw_straight_line_top(drawable_image)
+	draw_straight_line_left(drawable_image)
+	draw_curve_line_top(drawable_image)
+	draw_curve_line_left(drawable_image)
 
-noise_img = generate_noise_img()
+	noise_img = generate_noise_img()
 
-blured_filaments = clean_filaments.filter(ImageFilter.GaussianBlur(radius=2))
-blured_filaments.show()
-noisy_blured_filaments = Image.alpha_composite(noise_img, blured_filaments)
-converted_out = noisy_blured_filaments.convert("LA")
+	blured_filaments = clean_filaments.filter(ImageFilter.GaussianBlur(radius=2))
+	noisy_blured_filaments = Image.alpha_composite(noise_img, blured_filaments)
 
-# blured = blured.filter(ImageFilter.SHARPEN)
-converted_out.show()
+	# clean_out = blured_filaments.convert("LA")
+	clean_out = blured_filaments.convert("L")
+	noisy_out = noisy_blured_filaments.convert("L")
+
+	# clean_out.show()
+	# noisy_out.show()
+
+	return clean_out, noisy_out
+
+def load_data(size):
+	train_data = []
+	test_data = []
+	for i in range(size):
+		imgs = get_img_pair()
+		train_data.append(np.array(imgs[0]))
+		test_data.append(np.array(imgs[1]))
+	return np.array(train_data), np.array(test_data)
+
