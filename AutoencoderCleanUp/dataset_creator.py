@@ -3,7 +3,8 @@ import random
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImagePath
 
-IMG_SIZE = 28 # 256
+IMG_SIZE = 28
+# IMG_SIZE = 256
 
 def generate_noise_img():
 	# noise_img = Image.new("L", (IMG_SIZE,IMG_SIZE),'#000').convert('RGBA')

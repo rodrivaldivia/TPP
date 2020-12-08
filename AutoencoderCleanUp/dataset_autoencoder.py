@@ -14,7 +14,7 @@ from tensorflow.keras.models import Model
 
 print('Loading dataset...')
 
-train_data, noisy_train_data = dataset_creator.load_data(60000)
+train_data, noisy_train_data = dataset_creator.load_data(240000)
 test_data, noisy_test_data = dataset_creator.load_data(1000)
 
 x_train = train_data.astype('float32') / 255.
@@ -46,10 +46,10 @@ class Denoise(Model):
     self.encoder = tf.keras.Sequential([
       layers.Input(shape=(28, 28, 1)), 
       layers.Conv2D(16, (3,3), activation='relu', padding='same', strides=2),
-      layers.Conv2D(8, (3,3), activation='relu', padding='same', strides=2)])
+      layers.Conv2D(32, (3,3), activation='relu', padding='same', strides=2)])
 
     self.decoder = tf.keras.Sequential([
-      layers.Conv2DTranspose(8, kernel_size=3, strides=2, activation='relu', padding='same'),
+      layers.Conv2DTranspose(32, kernel_size=3, strides=2, activation='relu', padding='same'),
       layers.Conv2DTranspose(16, kernel_size=3, strides=2, activation='relu', padding='same'),
       layers.Conv2D(1, kernel_size=(3,3), activation='sigmoid', padding='same')])
 
@@ -63,7 +63,7 @@ autoencoder = Denoise()
 autoencoder.compile(optimizer='adam', loss=losses.MeanSquaredError())
 
 autoencoder.fit(x_train_noisy, x_train,
-                epochs=3,
+                epochs=10,
                 shuffle=True,
                 validation_data=(x_test_noisy, x_test))
 
