@@ -3,20 +3,20 @@ import random
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImagePath
 
-IMG_SIZE = 28
-# IMG_SIZE = 256
+# IMG_SIZE = 128
+IMG_SIZE = 256
 
 def generate_noise_img():
 	# noise_img = Image.new("L", (IMG_SIZE,IMG_SIZE),'#000').convert('RGBA')
 	# imarray = np.random.rand(IMG_SIZE,IMG_SIZE,3) * 50
 	
 	# Best aprox w/out noise profile
-	mean = 10
-	var = 60
+	mean = 5
+	var = 100 #60
 	sigma = var ** 0.5
 	gaussian = np.random.normal(mean, sigma, (IMG_SIZE,IMG_SIZE,3))
 	# Make it darker
-	gaussian = gaussian + 20
+	gaussian = gaussian + 5
 
 	noise_img = Image.fromarray(gaussian.astype('uint8')).convert("RGBA")
 	# noise_img.show()
@@ -116,10 +116,9 @@ def draw_curve_line_left(drawable_image):
 # MAIN
 
 def get_img_pair():
-	clean_filaments = Image.new('RGBA', (IMG_SIZE,IMG_SIZE), (255,255,255,0))
+	clean_filaments = Image.new('RGBA', (IMG_SIZE,IMG_SIZE), (0,0,0,255))
 
 	drawable_image = ImageDraw.Draw(clean_filaments)
-
 
 	draw_straight_line_top(drawable_image)
 	draw_straight_line_left(drawable_image)
@@ -132,16 +131,14 @@ def get_img_pair():
 	draw_curve_line_left(drawable_image)
 
 	noise_img = generate_noise_img()
+	# noise_img.show()
 
 	blured_filaments = clean_filaments.filter(ImageFilter.GaussianBlur(radius=2))
-	noisy_blured_filaments = Image.alpha_composite(noise_img, blured_filaments)
+	noisy_blured_filaments = Image.blend(noise_img, blured_filaments, 0.8)
 
 	# clean_out = blured_filaments.convert("LA")
 	clean_out = blured_filaments.convert("L")
 	noisy_out = noisy_blured_filaments.convert("L")
-
-	# clean_out.show()
-	# noisy_out.show()
 
 	return clean_out, noisy_out
 

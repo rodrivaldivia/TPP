@@ -14,7 +14,7 @@ from tensorflow.keras.models import Model
 
 print('Loading dataset...')
 
-train_data, noisy_train_data = dataset_creator.load_data(240000)
+train_data, noisy_train_data = dataset_creator.load_data(8000)
 test_data, noisy_test_data = dataset_creator.load_data(1000)
 
 x_train = train_data.astype('float32') / 255.
@@ -44,7 +44,7 @@ class Denoise(Model):
   def __init__(self):
     super(Denoise, self).__init__()
     self.encoder = tf.keras.Sequential([
-      layers.Input(shape=(28, 28, 1)), 
+      layers.Input(shape=(256, 256, 1)), 
       layers.Conv2D(16, (3,3), activation='relu', padding='same', strides=2),
       layers.Conv2D(32, (3,3), activation='relu', padding='same', strides=2)])
 
